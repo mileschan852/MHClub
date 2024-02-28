@@ -59,14 +59,77 @@
         #viewport-params-expand {
             top: 30px;
         }
+  
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item {
+            margin-bottom: 10px;
+        }
+
+        .total {
+            font-weight: bold;
+        }
     </style>
 </head>
-
 <body>
-    <main>
-        
-        <button onclick="toggleMainButton();">Toggle Main Button</button>
-    </main>
+    <div class="container">
+        <div class="item">
+            <label for="drink">🥤:</label>
+            <select id="drink" onchange="updateTotal()">
+                <option value="1000">1 x $1000</option>
+                <option value="5000">6 x $5000</option>
+            </select>
+        </div>
+
+        <div class="item">
+            <label for="ice">❄️:</label>
+            <select id="ice" onchange="updateTotal()">
+                <option value="1400">1.75 x $1400</option>
+                <option value="2450">3.5 x $2450</option>
+                <option value="4200">7 x 4200</option>
+                <option value="7000">14 x $7000</option>
+                <option value="11200">28 x $11200</option>
+            </select>
+        </div>
+
+        <div class="item">
+            <label for="needle">💉:</label>
+            <select id="needle" onchange="updateTotal()">
+                <option value="250">1 x $250</option>
+                <option value="400">2 x $400</option>
+            </select>
+        </div>
+
+        <div class="item">
+            <label for="water">💧:</label>
+            <select id="water" onchange="updateTotal()">
+                <option value="800">50 x $800</option>
+                <option value="1400">100 x $1400</option>
+                <option value="2400">200 x $2400</option>
+                <option value="5000">500 x $5000</option>
+            </select>
+        </div>
+
+        <div class="total">
+            Total Price: <span id="totalPrice">$0</span>
+        </div>
+    </div>
+
+    <script>
+        function updateTotal() {
+            let drink = parseInt(document.getElementById('drink').value);
+            let ice = parseInt(document.getElementById('ice').value);
+            let needle = parseInt(document.getElementById('needle').value);
+            let water = parseInt(document.getElementById('water').value);
+
+            let totalPrice = drink + ice + needle + water;
+            document.getElementById('totalPrice').innerText = '$' + totalPrice;
+        }
+    </script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
