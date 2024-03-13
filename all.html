@@ -139,6 +139,52 @@
             else 
               Telegram.WebApp.MainButton.hide();
         }
+
+        // Function to preview the order and send an invoice
+        function previewOrder() {
+            // Get the total price from the page
+            let totalPrice = parseInt(document.getElementById('totalPrice').innerText.replace('$', ''));
+        
+            // Check if the total price is valid
+            if (totalPrice <= 0) {
+                alert("Please select items to preview the order.");
+                return;
+            }
+    
+            // Get the user's chat ID
+            Telegram.WebApp.getUserInfo().then(function(userInfo) {
+                var chatId = userInfo.id;
+        
+                // Create an invoice using the Telegram Wallet API
+                Telegram.Wallet.sendInvoice({
+                    chat_id: chatId,
+                    title: 'Your Order',
+                    description: 'Description of your order',
+                    payload: 'Custom payload',
+                    provider_token: 'ZHNmW3v16GZpyvZ80pinCraK41favY801VZn',
+                    start_parameter: 'start_parameter',
+                    currency: 'USD',
+                    prices: [{ label: 'Total', amount: totalPrice * 100 }],
+                    need_name: true,
+                    need_phone_number: true,
+                    need_shipping_address: true,
+                    is_flexible: false
+                }).then(function (response) {
+                    // Handle successful invoice creation
+                    console.log(response);
+                    alert("Invoice sent successfully!");
+                }).catch(function (error) {
+                    // Handle error
+                    console.error(error);
+                    alert("Failed to send invoice. Please try again later.");
+                });
+        
+            }).catch(function(error) {
+                // Handle error getting user info
+                console.error("Error getting user info:", error);
+                alert("Failed to get user info. Please try again later.");
+            });
+        }
     </script>
 
     <!-- Eruda is console for mobile browsers -->
