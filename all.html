@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Miles' High Club</title>
+    <style>
+        body {
+            --bg-color: var(--tg-theme-bg-color);
+            font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 48px 24px;
+            padding: 0;
+            color-scheme: var(--tg-color-scheme);
+        }
+
+        a {
+            color: var(--tg-theme-link-color);
+        }
+        #viewport {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: var(--tg-viewport-stable-height, 100vh);
+            pointer-events: none;
+            transition: all .2s ease;
+        }
+        #viewport:after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border-width: 4px;
+            border-style: solid;
+            border-image: linear-gradient(45deg, rgba(64, 224, 208, .5), rgba(173, 255, 47, .5)) 1;
+        }
+
+        #viewport-params-size,
+        #viewport-params-expand {
+            content: attr(text);
+            position: absolute;
+            display: inline-block;
+            background: var(--tg-theme-link-color, rgb(64, 224, 208));
+            right: 4px;
+            left: auto;
+            font-size: 8px;
+            padding: 4px;
+            vertical-align: top;
+        }
+        #viewport-params-size {
+            top: 4px;
+        }
+        #viewport-params-expand {
+            top: 30px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .item {
+            margin-bottom: 10px;
+        }
+
+        .total {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="item">
+            <label for="drink">🥤:</label>
+            <select id="drink" onchange="updateTotal()">
+                <option value="0">🥤</option>
+                <option value="1000">1 x $1000</option>
+                <option value="5000">6 x $5000</option>
+            </select>
+        </div>
+
+        <div class="item">
+            <label for="ice">❄️:</label>
+            <select id="ice" onchange="updateTotal()">
+                <option value="0">❄️</option>
+                <option value="1400">1.75 x $1400</option>
+                <option value="2450">3.5 x $2450</option>
+                <option value="4200">7 x 4200</option>
+                <option value="7000">14 x $7000</option>
+                <option value="11200">28 x $11200</option>
+            </select>
+        </div>
+
+        <div class="item">
+            <label for="needle">💉:</label>
+            <select id="needle" onchange="updateTotal()">
+                <option value="0">💉</option>
+                <option value="250">1 x $250</option>
+                <option value="400">2 x $400</option>
+            </select>
+        </div>
+
+        <div class="item">
+            <label for="water">💧:</label>
+            <select id="water" onchange="updateTotal()">
+                <option value="0">💧</option>
+                <option value="800">50 x $800</option>
+                <option value="1400">100 x $1400</option>
+                <option value="2400">200 x $2400</option>
+                <option value="5000">500 x $5000</option>
+            </select>
+        </div>
+
+        <div class="total">
+            Total Price: <span id="totalPrice">$0</span>
+        </div>
+    </div>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Init TWA
+        Telegram.WebApp.ready();
+        function updateTotal() {
+            let drink = parseInt(document.getElementById('drink').value);
+            let ice = parseInt(document.getElementById('ice').value);
+            let needle = parseInt(document.getElementById('needle').value);
+            let water = parseInt(document.getElementById('water').value);
+
+            let totalPrice = drink + ice + needle + water;
+            document.getElementById('totalPrice').innerText = '$' + totalPrice;
+            if( totalPrice > 0 )
+              Telegram.WebApp.MainButton.show();
+            else 
+              Telegram.WebApp.MainButton.hide();
+        }
+
+        // Function to preview the order and send an invoice
+        function previewOrder() {
+            // Get the total price from the page
+            let totalPrice = parseInt(document.getElementById('totalPrice').innerText.replace('$', ''));
+        
+            // Check if the total price is valid
+            if (totalPrice <= 0) {
+                alert("Please select items to preview the order.");
+                return;
+            }
+    
+            // Get the user's chat ID
+            Telegram.WebApp.getUserInfo().then(function(userInfo) {
+                var chatId = userInfo.id;
+        
+                // Create an invoice using the Telegram Wallet API
+                Telegram.Wallet.sendInvoice({
+                    chat_id: chatId,
+                    title: 'Your Order',
+                    description: 'Description of your order',
+                    payload: 'Custom payload',
+                    provider_token: 'ZHNmW3v16GZpyvZ80pinCraK41favY801VZn',
+                    start_parameter: 'start_parameter',
+                    currency: 'USD',
+                    prices: [{ label: 'Total', amount: totalPrice * 100 }],
+                    need_name: true,
+                    need_phone_number: true,
+                    need_shipping_address: true,
+                    is_flexible: false
+                }).then(function (response) {
+                    // Handle successful invoice creation
+                    console.log(response);
+                    alert("Invoice sent successfully!");
+                }).catch(function (error) {
+                    // Handle error
+                    console.error(error);
+                    alert("Failed to send invoice. Please try again later.");
+                });
+        
+            }).catch(function(error) {
+                // Handle error getting user info
+                console.error("Error getting user info:", error);
+                alert("Failed to get user info. Please try again later.");
+            });
+        }
+    </script>
+
+    <!-- Eruda is console for mobile browsers -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
+
+</body>
+</html>
