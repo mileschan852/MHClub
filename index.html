@@ -14,15 +14,20 @@
             height: 100vh;
             background-color: #f0f0f0;
         }
-        #loginButton {
-            width: 100%; /* Set button width to 100% of parent container */
-            max-width: 300px; /* Set maximum button width to limit size on larger screens */
+        #loginButtonContainer {
+            width: 100%; /* Set container width to 100% of parent container */
+            max-width: 300px; /* Set maximum container width to limit size on larger screens */
             cursor: pointer;
+        }
+        #loginButton {
+            width: 100%; /* Set button width to 100% of container */
         }
     </style>
 </head>
 <body>
-    <img id="loginButton" src="connectbutton.jpg" alt="Wallet Button">
+    <div id="loginButtonContainer">
+        <img id="loginButton" src="connectbutton.jpg" alt="Wallet Button">
+    </div>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         document.getElementById('loginButton').addEventListener('click', function() {
